@@ -1,0 +1,23 @@
+ConnectedBlinds
+Filip Lindström & Hannes Hedlund
+2017-september 06
+
+Beskrivning:
+Styra persienn med hjälp av Wi-Fi
+Webbsida för att se status på persienner och ljus, samt för att välja automatiskt eller manuellt läge.
+I automatiskt läge styrs persiennerna efter ljuset.
+I manuellt läge styrs persiennerna av användare valt läge på websida.
+
+Grundfunktion:
+Kunna styra persienn i manuellt läge via terminal eller liknande.
+
+Andra utkast:
+Kunna se status för ljuset på hemsida.
+
+Mål:
+Automatisk funktion där persiennerna styrs av ljuset.
+Automatiskt läge och manuellt läge.
+Kunna välja läge via hemsida. Kunna se status och kontrollera servo manuellt.
+Läsa av servot och jämföra med vart den förväntas vara, skicka den statusen.
+Om servot inte nått fram till förväntad position på en viss tid, försök igen, '
+om inte heller det funkar, sätt felmeddelande.
