@@ -9,10 +9,11 @@ I automatiskt läge styrs persiennerna efter ljuset.
 I manuellt läge styrs persiennerna av användare valt läge på websida.
 
 Grundfunktion:
-Kunna styra persienn i manuellt läge via terminal eller liknande.
+Kunna styra persienn med två knappar från lokal hemsida i serverläge.
+Kunna styra persienn manuellt med fysisk switch i manuellt läge.
 
 Andra utkast:
-Kunna se status för ljuset på hemsida.
+Placera server på ett ställe i rummet, och servo på ett annat med en bluetooth-koppling.
 
 Mål:
 Automatisk funktion där persiennerna styrs av ljuset.
@@ -21,3 +22,9 @@ Kunna välja läge via hemsida. Kunna se status och kontrollera servo manuellt.
 Läsa av servot och jämföra med vart den förväntas vara, skicka den statusen.
 Om servot inte nått fram till förväntad position på en viss tid, försök igen, '
 om inte heller det funkar, sätt felmeddelande.
+
+Testfall:
+Surfa in på hemsida och sätt manuellt läge. Prova att slå till och från brytare och se persienn öppna och stänga.
+Surfa in på hemsida och sätt direkt läge för persienn. Se om persiennen reagerar.
+Kan man på hemsidan se om persienn är öppen eller stängd?
+Är manuellt läge aktivt om ingen WiFi anslutning finns?
