@@ -28,6 +28,8 @@ Servo myservo;
 WiFiServer server(80);
 
 
+
+
 /* ------------------------------------------------------*/
 /*
    Initialize the Wifi-communication.
@@ -81,103 +83,91 @@ void initWifi(void)
 void setup()
 {
     Serial.begin(115200);
-
-    delay(50);
+    delay(1500);
 
     initWifi();
 
     myservo.write(30);
-
     delay(1000);
 }
 
 
 /* ------------------------------------------------------*/
 /*
-   Sets LED and servo to correct values based on what state
-   webpage is in
+   Sets servo max and min to given values
+*/
+/* ------------------------------------------------------*/
+void controlServo(int Status) {
+	// OPEN
+	if (Status == 0 && openDone == FALSE) {
+        digitalWrite(blueLed, HIGH);
+		myservo.attach(14);
+		for (int pos = 0; pos <= 180 ; pos++) {
+			myservo.write(pos);
+			delay(15);
+			if (pos == 180) {
+				openDone = TRUE;
+				closeDone = FALSE;
+				Serial.println("Open done");
+				myservo.detach();
+			}
+		}
+	}
+	// CLOSE
+	if (Status == 1 && closeDone == FALSE) {
+        digitalWrite(blueLed, LOW);
+		myservo.attach(14);
+		for (int pos = 180; pos >= 0 ; pos--) {
+			myservo.write(pos);
+			delay(15);
+			if (pos == 0) {
+				closeDone = TRUE;
+				openDone = FALSE;
+				Serial.println("Close done");
+			}
+		}
+		myservo.detach();
+	}
+}
+
+
+
+/* ------------------------------------------------------*/
+/*
+   Sets LED
 */
 /* ------------------------------------------------------*/
 void function(void)
 {
+	enum enumStatus{
+		Open,
+		Close,
+	};
+
 	switch (ModeState) {
 	case 0:
 		// Manual Open
         if (digitalRead(16) == 1) {
-            digitalWrite(blueLed, HIGH);
             digitalWrite(greenLed, HIGH);
-
-            if (openDone == FALSE) {
-            	myservo.attach(14);
-    			for (int pos = 0; pos <= 180 ; pos++) {
-    				myservo.write(pos);
-    				delay(15);
-    				if (pos == 180) {
-    					openDone = TRUE;
-    					closeDone = FALSE;
-    					Serial.println("Open done");
-    					myservo.detach();
-    				}
-    			}
-            }
+            controlServo((int)Open);
         }
         // Manual Close
         else if (digitalRead(16) == 0) {
-            digitalWrite(blueLed, LOW);
             digitalWrite(greenLed, HIGH);
-
-            if (closeDone == FALSE) {
-            	myservo.attach(14);
-    			for (int pos = 180; pos >= 0 ; pos--) {
-    				myservo.write(pos);
-    				delay(15);
-    				if (pos == 0) {
-    					closeDone = TRUE;
-    					openDone = FALSE;
-    					Serial.println("Close done");
-    				}
-    			}
-    			myservo.detach();
-            }
+            controlServo((int)Close);
         }
 		break;
 
 	case 1:
 		// Auto Open
-        digitalWrite(blueLed, HIGH);
         digitalWrite(greenLed, LOW);
-        if (openDone == FALSE) {
-        	myservo.attach(14);
-			for (int pos = 0; pos <= 180 ; pos++) {
-				myservo.write(pos);
-				delay(15);
-				if (pos == 180) {
-					openDone = TRUE;
-					closeDone = FALSE;
-					Serial.println("Open done");
-					myservo.detach();
-				}
-			}
-        }
+        controlServo((int)Open);
 		break;
 
 	case 2:
 		// Auto Close
-        digitalWrite(blueLed, LOW);
         digitalWrite(greenLed, LOW);
-        if (closeDone == FALSE) {
-        	myservo.attach(14);
-			for (int pos = 180; pos >= 0 ; pos--) {
-				myservo.write(pos);
-				delay(15);
-				if (pos == 0) {
-					closeDone = TRUE;
-					openDone = FALSE;
-					Serial.println("Close done");
-				}
-			}
-			myservo.detach();
-        }
+        controlServo((int)Close);
 		break;
 	}
 }
