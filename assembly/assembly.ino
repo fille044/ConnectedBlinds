@@ -11,23 +11,30 @@
 #define ON 0
 #define OFF 1
 
+#define MAX 180
+#define SERVOSPEED 30
 
 /* Static variables */
-const char* ssid = "Molk";
+const char* ssid = "CB";
 const char* password = "Molk0901";
 
-int ModeState = LOW;
+int ModeState = 0;
 int blueLed = 13; 		// D7
 int greenLed = 12;  	// D6
+int button = 16;
 
 int servoPosition = 0;
 bool closeDone;
 bool openDone;
 
+bool isTimeout = FALSE;
+int timeoutCounter = 0;
+
+bool isButtonPressed;
+int prevButtonState = digitalRead(16);
+
 Servo myservo;
 WiFiServer server(80);
-
-
 
 
 /* ------------------------------------------------------*/
@@ -39,10 +46,10 @@ WiFiServer server(80);
 /* ------------------------------------------------------*/
 void initWifi(void)
 {
-
     // Connect to WiFi network
 	Serial.println();
 	Serial.println();
+	delay(500);
 	Serial.print("Connecting to ");
 	Serial.println(ssid);
 
@@ -50,6 +57,12 @@ void initWifi(void)
 
 	while (WiFi.status() != WL_CONNECTED) {
 		delay(500);
+		timeoutCounter++;
+		if (timeoutCounter > 60) {
+			isTimeout = TRUE;
+			Serial.println("Connection has timed out, entering manual mode");
+			return;
+		}
 		Serial.print(".");
 	}
 	Serial.println("");
@@ -65,11 +78,11 @@ void initWifi(void)
 	Serial.print(WiFi.localIP());
 	Serial.println("/");
 
-    pinMode(16, INPUT);
-    pinMode(blueLed, OUTPUT);
-    pinMode(greenLed, OUTPUT);
-    digitalWrite(blueLed, LOW);
-    digitalWrite(greenLed, LOW);
+	Serial.println();
+	Serial.print("MAC: ");
+	Serial.println(WiFi.macAddress());
+	Serial.println("/");
+	Serial.println("/");
 }
 
 
@@ -89,27 +102,36 @@ void setup()
 
     myservo.write(30);
     delay(1000);
+
+    pinMode(button, INPUT);
+    pinMode(blueLed, OUTPUT);
+    pinMode(greenLed, OUTPUT);
+    digitalWrite(blueLed, LOW);
+    digitalWrite(greenLed, LOW);
 }
 
 
 /* ------------------------------------------------------*/
 /*
-   Sets servo max and min to given values
+   Sets servo max and min based on input state
 */
 /* ------------------------------------------------------*/
-void controlServo(int Status) {
+void controlServo(int Status)
+{
 	// OPEN
 	if (Status == 0 && openDone == FALSE) {
         digitalWrite(blueLed, HIGH);
 		myservo.attach(14);
-		for (int pos = 0; pos <= 180 ; pos++) {
+
+		// Runs servo slowly until end is reached
+		for (int pos = 0; pos <= MAX ; pos++) {
 			myservo.write(pos);
-			delay(15);
-			if (pos == 180) {
+			delay(SERVOSPEED);
+			if (pos == MAX) {
 				openDone = TRUE;
 				closeDone = FALSE;
 				Serial.println("Open done");
-				myservo.detach();
+				myservo.detach();    // To eliminate noise
 			}
 		}
 	}
@@ -117,24 +139,26 @@ void controlServo(int Status) {
 	if (Status == 1 && closeDone == FALSE) {
         digitalWrite(blueLed, LOW);
 		myservo.attach(14);
-		for (int pos = 180; pos >= 0 ; pos--) {
+
+		// Runs servo slowly until end is reached
+		for (int pos = MAX; pos >= 0 ; pos--) {
 			myservo.write(pos);
-			delay(15);
+			delay(SERVOSPEED);
 			if (pos == 0) {
 				closeDone = TRUE;
 				openDone = FALSE;
 				Serial.println("Close done");
+				myservo.detach(); // To eliminate noise
 			}
 		}
-		myservo.detach();
 	}
 }
 
 
-
 /* ------------------------------------------------------*/
 /*
-   Sets LED
+   Goes through the different states of modes and calls function
+   servo setting
 */
 /* ------------------------------------------------------*/
 void function(void)
@@ -153,7 +177,7 @@ void function(void)
         }
         // Manual Close
         else if (digitalRead(16) == 0) {
-            digitalWrite(greenLed, HIGH);
+        	digitalWrite(greenLed, HIGH);
             controlServo((int)Close);
         }
 		break;
@@ -180,6 +204,10 @@ void function(void)
 /* ------------------------------------------------------*/
 void loop()
 {
+	if (prevButtonState != digitalRead(16)) {
+		ModeState = 0;
+	}
+	prevButtonState = digitalRead(16);
     function();
     int counter = 0;
     // Check if a client has connected
@@ -215,7 +243,6 @@ void loop()
 
         ModeState = 2;
     }
-
 
     // Return the response
     client.println("HTTP/1.1 200 OK");
