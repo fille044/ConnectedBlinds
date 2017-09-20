@@ -1,27 +1,14 @@
 /* Defines */
 #include <ESP8266WiFi.h>
 #include <Servo.h>
-
 #include <WiFiClient.h>
 #include <WiFiServer.h>
 #include <WiFiUdp.h>
 
-#define FALSE 0
-#define TRUE 1
-#define ON 0
-#define OFF 1
+#include "declaration.h"
 
-#define MAX 180
-#define SERVOSPEED 30
-
-/* Static variables */
-const char* ssid = "CB";
-const char* password = "Molk0901";
 
 int ModeState = 0;
-int blueLed = 13; 		// D7
-int greenLed = 12;  	// D6
-int button = 16;
 
 int servoPosition = 0;
 bool closeDone;
@@ -33,8 +20,8 @@ int timeoutCounter = 0;
 bool isButtonPressed;
 int prevButtonState = digitalRead(16);
 
-Servo myservo;
-WiFiServer server(80);
+
+
 
 
 /* ------------------------------------------------------*/
@@ -108,6 +95,7 @@ void setup()
     pinMode(greenLed, OUTPUT);
     digitalWrite(blueLed, LOW);
     digitalWrite(greenLed, LOW);
+
 }
 
 
@@ -204,6 +192,8 @@ void function(void)
 /* ------------------------------------------------------*/
 void loop()
 {
+	light = analogRead(phototransistor);
+	//Serial.println(light);
 	if (prevButtonState != digitalRead(16)) {
 		ModeState = 0;
 	}
