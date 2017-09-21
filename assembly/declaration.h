@@ -19,11 +19,12 @@
 
 
 /* Static variables */
-const char* ssid = "Molk";
-const char* password = "Molk0901";
+const char* ssid = "ConnectB";
+const char* password = "12345678";
 
 Servo myservo;
 WiFiServer server(80);
+WiFiClient client;
 
 int light = 0;
 const byte phototransistor = A0;
@@ -31,7 +32,14 @@ const byte blueLed = 13; 		// D7
 const byte greenLed = 12;  	// D6
 const byte button = 16;
 
+bool isTimeout = FALSE;
+int timeoutCounter = 0;
+
 /* Function declarations */
+void initWifi(void);
+void buildWebpage(void);
+
+int ModeState = 0;
 
 
 #endif /* DECLARATION_H_ */

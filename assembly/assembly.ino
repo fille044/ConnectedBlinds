@@ -7,70 +7,12 @@
 
 #include "declaration.h"
 
-
-int ModeState = 0;
-
 int servoPosition = 0;
 bool closeDone;
 bool openDone;
 
-bool isTimeout = FALSE;
-int timeoutCounter = 0;
-
 bool isButtonPressed;
 int prevButtonState = digitalRead(16);
-
-
-
-
-
-/* ------------------------------------------------------*/
-/*
-   Initialize the Wifi-communication.
-   Connects to network "Molk" and prints out the device
-   IP-adress in serial monitor.
-*/
-/* ------------------------------------------------------*/
-void initWifi(void)
-{
-    // Connect to WiFi network
-	Serial.println();
-	Serial.println();
-	delay(500);
-	Serial.print("Connecting to ");
-	Serial.println(ssid);
-
-	WiFi.begin(ssid, password);
-
-	while (WiFi.status() != WL_CONNECTED) {
-		delay(500);
-		timeoutCounter++;
-		if (timeoutCounter > 60) {
-			isTimeout = TRUE;
-			Serial.println("Connection has timed out, entering manual mode");
-			return;
-		}
-		Serial.print(".");
-	}
-	Serial.println("");
-	Serial.println("WiFi connected");
-
-	// Start the server
-	server.begin();
-	Serial.println("Server started");
-
-	// Print the IP address
-	Serial.print("Use this URL to connect: ");
-	Serial.print("http://");
-	Serial.print(WiFi.localIP());
-	Serial.println("/");
-
-	Serial.println();
-	Serial.print("MAC: ");
-	Serial.println(WiFi.macAddress());
-	Serial.println("/");
-	Serial.println("/");
-}
 
 
 /* ------------------------------------------------------*/
@@ -95,7 +37,6 @@ void setup()
     pinMode(greenLed, OUTPUT);
     digitalWrite(blueLed, LOW);
     digitalWrite(greenLed, LOW);
-
 }
 
 
@@ -201,7 +142,7 @@ void loop()
     function();
     int counter = 0;
     // Check if a client has connected
-    WiFiClient client = server.available();
+    client = server.available();
     if (!client) {
         return;
     }
@@ -234,12 +175,15 @@ void loop()
         ModeState = 2;
     }
 
+
     // Return the response
     client.println("HTTP/1.1 200 OK");
     client.println("Content-Type: text/html");
     client.println(""); //  do not forget this one
+
     client.println("<!DOCTYPE HTML>");
     client.println("<html>");
+
     client.println("<head><title>ConnectedBlinds</title></head>");
     client.println("<body>");
     client.print("Mode is now: ");
@@ -254,12 +198,12 @@ void loop()
         client.print("Automatic closed");
     }
 
-    client.println("<br>-----------------------------------------------</br>");
-    client.println("<br><br>");
-    client.println("<a href=\"/Manual\"\"><button>Manual</button></a>");
-    client.println("<br><br>");
+    client.println("<br>-----------------------------------------------</br><br><br>");
+    client.println("<a href=\"/Manual\"\"><button>Manual</button></a><br><br>");
     client.println("<a href=\"/Open\"\"><button>Open</button></a>");
     client.println("<a href=\"/Closed\"\"><button>Closed</button></a>");
+	client.println("<br>-----------------------------------------------</br>");
+
     client.println("</body>");
     client.println("</html>");
 
