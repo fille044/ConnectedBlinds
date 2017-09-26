@@ -1,11 +1,12 @@
-/* Defines */
-#include <ESP8266WiFi.h>
-#include <Servo.h>
-#include <WiFiClient.h>
-#include <WiFiServer.h>
-#include <WiFiUdp.h>
+/*
+ * init.ino
+ *
+ *  Created on: 26 Sep 2017
+ *      Author: fille
+ */
 
-#include "declaration.h"
+
+#include "assembly.h"
 
 
 /* ------------------------------------------------------*/
@@ -17,7 +18,7 @@
 /* ------------------------------------------------------*/
 void initWifi(void)
 {
-    // Connect to WiFi network
+  // Connect to WiFi network
 	Serial.println();
 	Serial.println();
 	delay(500);
@@ -28,17 +29,22 @@ void initWifi(void)
 
 	while (WiFi.status() != WL_CONNECTED) {
 		delay(500);
-		timeoutCounter++;
-		if (timeoutCounter > 60) {
-			isTimeout = TRUE;
-			Serial.println("Connection has timed out, entering manual mode");
-			return;
+		connectTimeOutCounter++;
+		if (connectTimeOutCounter > 30) {
+			connectTimeOutCounter = 0;
+			Serial.println("Connection has timed out, trying again");
+			initWifi();
 		}
 		Serial.print(".");
 	}
 	Serial.println("");
 	Serial.println("WiFi connected");
-
+	for (int ix = 0; ix < 10; ix++) {
+		digitalWrite(BLUELED, HIGH);
+		delay(100);
+		digitalWrite(BLUELED, LOW);
+		delay(100);
+	}
 	// Start the server
 	server.begin();
 	Serial.println("Server started");
@@ -54,4 +60,21 @@ void initWifi(void)
 	Serial.println(WiFi.macAddress());
 	Serial.println("/");
 	Serial.println("/");
+}
+
+
+/* ------------------------------------------------------*/
+/*
+   Sets up inputs and outputs
+*/
+/* ------------------------------------------------------*/
+void initIO(void)
+{
+    pinMode(BUTTON, INPUT);
+    pinMode(BLUELED, OUTPUT);
+    pinMode(GREENLED, OUTPUT);
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, LOW);
+    digitalWrite(BLUELED, LOW);
+    digitalWrite(GREENLED, LOW);
 }
