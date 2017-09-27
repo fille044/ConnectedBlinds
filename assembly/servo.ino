@@ -20,9 +20,9 @@ void controlServo(int Status)
 	if (Status == Open && openDone == FALSE) {
         digitalWrite(BLUELED, HIGH);
 		myservo.attach(14);
-
+		int pos = myservo.read();
 		// Runs servo slowly until end is reached
-		for (int pos = 0; pos <= MAXROTATION ; pos++) {
+		for (; pos <= MAXROTATION ; pos++) {
 			myservo.write(pos);
 			delay(SERVOSPEED);
 			if (pos == MAXROTATION) {
@@ -37,9 +37,9 @@ void controlServo(int Status)
 	if (Status == Close && closeDone == FALSE) {
         digitalWrite(BLUELED, LOW);
 		myservo.attach(14);
-
+		int pos = myservo.read();
 		// Runs servo slowly until end is reached
-		for (int pos = MAXROTATION; pos >= 0 ; pos--) {
+		for (; pos >= 0 ; pos--) {
 			myservo.write(pos);
 			delay(SERVOSPEED);
 			if (pos == 0) {
@@ -52,10 +52,12 @@ void controlServo(int Status)
 	}
 
 	// If Phototransistor mode is chosen on webpage, run this state.
-	if(Status == Photo) {
+	if(Status == Auto) {
 		myservo.detach(); // To eliminate noise
 		LightCounter++;
 		delay(10);
+		closeDone = FALSE;
+		openDone = FALSE;
 		// Time to sample analog input
 		if (LightCounter > LIGHTCOUNTERLIMIT) {
 			static int PrevLight = myservo.read();

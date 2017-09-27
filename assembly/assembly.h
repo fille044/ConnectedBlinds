@@ -34,9 +34,8 @@
 // IO pin defines
 #define BLUELED 13 		// D7 GPIO13
 #define GREENLED 12  	// D6 GPIO12
-#define BUTTON 16      // D0 GPIO16
 #define PHOTOTRANSISTOR A0
-#define LIGHTCOUNTERLIMIT 1000
+#define LIGHTCOUNTERLIMIT 1000	// Seconds times 100
 
 /* Public variables */
 const char* ssid = "Molk";
@@ -57,9 +56,9 @@ WiFiClient client;
 String request;
 
 enum enumStatus{
+	Auto,
 	Open,
 	Close,
-	Photo,
 };
 
 
