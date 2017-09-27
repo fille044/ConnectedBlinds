@@ -35,41 +35,25 @@ void handleStates(void)
 {
 	switch (ModeState) {
 	case 0:
-		// Forces the servo to adjust to light if auto mode is chosen
-		LightCounter = LIGHTCOUNTERLIMIT;
-		// Manual Open
-        if (digitalRead(BUTTON) == 1) {
-            digitalWrite(GREENLED, HIGH);
-            controlServo((int)Open);
-        }
-        // Manual Close
-        else if (digitalRead(BUTTON) == 0) {
-        	digitalWrite(GREENLED, HIGH);
-            controlServo((int)Close);
-        }
+		//Phototransistor Auto
+		digitalWrite(GREENLED, HIGH);
+		digitalWrite(BLUELED, LOW);
+		controlServo((int)Auto);
 		break;
-
 	case 1:
 		// Forces the servo to adjust to light if auto mode is chose
 		LightCounter = LIGHTCOUNTERLIMIT;
 		// Web Open
-        digitalWrite(GREENLED, LOW);
-        controlServo((int)Open);
+		digitalWrite(GREENLED, LOW);
+		controlServo((int)Open);
 		break;
-
 	case 2:
 		// Forces the servo to adjust to light if auto mode is chosen
 		LightCounter = LIGHTCOUNTERLIMIT;
 		// Web Close
-        digitalWrite(GREENLED, LOW);
-        controlServo((int)Close);
+		digitalWrite(GREENLED, LOW);
+		controlServo((int)Close);
 		break;
-
-  case 3:
-    //Phototransistor Auto
-        digitalWrite(LED_BUILTIN, HIGH);
-        controlServo((int)Photo);
-    break;
   }
 }
 
@@ -81,25 +65,8 @@ void handleStates(void)
 /* ------------------------------------------------------*/
 void loop()
 {
-	static int prevButtonState = 0;
-	static int currButtonState = 0;
-	static int buttonCounter = 0;
-
 	handleStates();
-
-    buttonCounter++;
 	delay(20);
-	if (buttonCounter > 100) {
-		currButtonState = digitalRead(BUTTON);
-		buttonCounter = 0;
-	}
-
-	if (prevButtonState != currButtonState) {
-		ModeState = 0;
-		prevButtonState = currButtonState;
-		Serial.println("----------------");
-	}
-
     int clientCounter = 0;
     // Check if a client has connected
     client = server.available();

@@ -70,7 +70,6 @@ void initWifi(void)
 /* ------------------------------------------------------*/
 void initIO(void)
 {
-    pinMode(BUTTON, INPUT);
     pinMode(BLUELED, OUTPUT);
     pinMode(GREENLED, OUTPUT);
     pinMode(LED_BUILTIN, OUTPUT);
